@@ -41,4 +41,25 @@ func TestSerializer(t *testing.T) {
 	deserialized, err = s.Deserialize(buf)
 	assert.NoError(err)
 	assert.Equal(pointer, deserialized)
+
+	value = Object{
+		12345,
+		"foo",
+	}
+	data, err := s.SerializeByte(value)
+	assert.NoError(err)
+	deserialized, err = s.DeserializeByte(data)
+	assert.NoError(err)
+	assert.Equal(value, deserialized)
+
+	pointer = &Object{
+		54321,
+		"bar",
+	}
+	data, err = s.SerializeByte(pointer)
+	assert.NoError(err)
+	deserialized, err = s.DeserializeByte(data)
+	assert.NoError(err)
+	assert.Equal(pointer, deserialized)
+
 }
