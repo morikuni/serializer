@@ -9,6 +9,8 @@ type Serializer interface {
 	Register(types ...interface{})
 	Serialize(w io.Writer, v interface{}) error
 	Deserialize(r io.Reader) (interface{}, error)
+	SerializeByte(v interface{}) ([]byte, error)
+	DeserializeByte(data []byte) (interface{}, error)
 }
 
 func NewSerializer(options ...Option) Serializer {
@@ -64,4 +66,17 @@ func (s serializer) Deserialize(r io.Reader) (interface{}, error) {
 
 	buf := bytes.NewReader(d.Payload)
 	return ctor.New(buf, s.codec)
+}
+
+func (s serializer) SerializeByte(v interface{}) ([]byte, error) {
+	buf := &bytes.Buffer{}
+	if err := s.Serialize(buf, v); err != nil {
+		return nil, err
+	}
+	return buf.Bytes(), nil
+}
+
+func (s serializer) DeserializeByte(data []byte) (interface{}, error) {
+	buf := bytes.NewReader(data)
+	return s.Deserialize(buf)
 }
