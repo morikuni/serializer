@@ -8,10 +8,17 @@ import (
 // type of v.
 func TypeNameOf(v interface{}) string {
 	t := reflect.TypeOf(v)
-	delimiter := "."
+
+	ptr := ""
 	if t.Kind() == reflect.Ptr {
 		t = t.Elem()
-		delimiter = ".*"
+		ptr = "*"
 	}
-	return t.PkgPath() + delimiter + t.Name()
+
+	pkg := t.PkgPath() + "."
+	if pkg == "." {
+		pkg = ""
+	}
+
+	return pkg + ptr + t.Name()
 }
