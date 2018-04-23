@@ -2,8 +2,7 @@
 
 [![GoDoc](https://godoc.org/github.com/morikuni/serializer?status.svg)](https://godoc.org/github.com/morikuni/serializer)
 
-serialize go struct into bytes, and deserialize them into go struct.
-
+serializer serializes a Go object into a bytes.
 
 ```go
 package main
@@ -21,7 +20,10 @@ type Object struct {
 }
 
 func main() {
-	s := serializer.NewSerializer()
+	s := serializer.NewSerializer(
+		serializer.NewJSONMarshaler(),
+		serializer.NewTextJSONEncoder(),
+	)
 
 	// Register the struct to serialize and deserialize
 	s.Register(Object{})
@@ -38,11 +40,10 @@ func main() {
 		panic(err)
 	}
 
-	// Default codec is JSON
 	fmt.Println(buf.String())
-	// {"id":"main.Object","payload":"eyJJRCI6MTIzNDUsIk5hbWUiOiJmb28ifQo="}
+	// {"name":"main.Object","payload":"{\"ID\":12345,\"Name\":\"foo\"}"}
 
-	// Deserialize from io.Reader without specifying the actual type.
+	// Deserialize from a io.Reader without specifying the actual type.
 	x, err := s.Deserialize(buf)
 	if err != nil {
 		panic(err)
@@ -50,5 +51,6 @@ func main() {
 
 	fmt.Printf("%#v\n", x)
 	// main.Object{ID:12345, Name:"foo"}
+}
 }
 ```

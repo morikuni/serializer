@@ -40,3 +40,21 @@ func TestJSONEncoder(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, d1, d2)
 }
+
+func TestTextJSONEncoder(t *testing.T) {
+	e := NewTextJSONEncoder()
+
+	d1 := Data{
+		Name:    "aaa",
+		Payload: []byte{1, 2, 3},
+	}
+
+	buf := &bytes.Buffer{}
+
+	err := e.Encode(buf, d1)
+	assert.NoError(t, err)
+
+	d2, err := e.Decode(buf)
+	assert.NoError(t, err)
+	assert.Equal(t, d1, d2)
+}

@@ -40,3 +40,27 @@ func (jsonEncoder) Decode(r io.Reader) (Data, error) {
 	}
 	return d, nil
 }
+
+func NewTextJSONEncoder() Encoder {
+	return textJSONEncoder{}
+}
+
+type textJSONEncoder struct{}
+
+func (textJSONEncoder) Encode(w io.Writer, d Data) error {
+	sd := stringData{d.Name, string(d.Payload)}
+	return json.NewEncoder(w).Encode(sd)
+}
+
+func (textJSONEncoder) Decode(r io.Reader) (Data, error) {
+	var sd stringData
+	if err := json.NewDecoder(r).Decode(&sd); err != nil {
+		return Data{}, err
+	}
+	return Data{sd.Name, []byte(sd.Payload)}, nil
+}
+
+type stringData struct {
+	Name    string `json:"name"`
+	Payload string `json:"payload"`
+}
