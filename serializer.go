@@ -1,82 +1,86 @@
 package serializer
 
 import (
-	"bytes"
 	"io"
+	"reflect"
 )
 
 type Serializer interface {
 	Register(types ...interface{})
+	RegisterByName(name string, t interface{})
 	Serialize(w io.Writer, v interface{}) error
 	Deserialize(r io.Reader) (interface{}, error)
-	SerializeByte(v interface{}) ([]byte, error)
-	DeserializeByte(data []byte) (interface{}, error)
 }
 
-func NewSerializer(options ...Option) Serializer {
+func NewSerializer(marshaler Marshaler, encoder Encoder) Serializer {
 	s := serializer{
-		NewTypeRegistry(),
-		NewJSONCodec(),
-	}
-	for _, o := range options {
-		o(&s)
+		make(map[string]reflect.Type),
+		marshaler,
+		encoder,
 	}
 	return s
 }
 
 type serializer struct {
-	registry TypeRegistry
-	codec    Codec
+	typeMap   map[string]reflect.Type
+	marshaler Marshaler
+	encoder   Encoder
 }
 
 func (s serializer) Register(types ...interface{}) {
 	for _, t := range types {
-		s.registry.Register(NewType(t))
+		s.RegisterByName(TypeNameOf(t), t)
 	}
 }
 
+func (s serializer) RegisterByName(name string, t interface{}) {
+	s.typeMap[name] = reflect.TypeOf(t)
+}
+
 func (s serializer) Serialize(w io.Writer, v interface{}) error {
-	id := NewTypeID(v)
-	if _, ok := s.registry.Find(id); !ok {
-		return UnknownTypeError{id}
+	name := TypeNameOf(v)
+	if _, ok := s.typeMap[name]; !ok {
+		return UnknownTypeError{name}
 	}
 
-	buf := &bytes.Buffer{}
-	if err := s.codec.Encode(buf, v); err != nil {
+	payload, err := s.marshaler.Marshal(v)
+	if err != nil {
 		return err
 	}
 
 	d := Data{
-		id,
-		buf.Bytes(),
+		name,
+		payload,
 	}
-	return s.codec.Encode(w, &d)
+	return s.encoder.Encode(w, d)
 }
 
 func (s serializer) Deserialize(r io.Reader) (interface{}, error) {
-	var d Data
-	if err := s.codec.Decode(r, &d); err != nil {
+	d, err := s.encoder.Decode(r)
+	if err != nil {
 		return nil, err
 	}
 
-	ctor, ok := s.registry.Find(d.ID)
+	t, ok := s.typeMap[d.Name]
 	if !ok {
-		return nil, UnknownTypeError{d.ID}
+		return nil, UnknownTypeError{d.Name}
 	}
 
-	buf := bytes.NewReader(d.Payload)
-	return ctor.New(buf, s.codec)
-}
+	isPtr := false
+	if t.Kind() == reflect.Ptr {
+		t = t.Elem()
+		isPtr = true
+	}
 
-func (s serializer) SerializeByte(v interface{}) ([]byte, error) {
-	buf := &bytes.Buffer{}
-	if err := s.Serialize(buf, v); err != nil {
+	i := reflect.New(t).Interface()
+
+	if err := s.marshaler.Unmarshal(d.Payload, i); err != nil {
 		return nil, err
 	}
-	return buf.Bytes(), nil
-}
 
-func (s serializer) DeserializeByte(data []byte) (interface{}, error) {
-	buf := bytes.NewReader(data)
-	return s.Deserialize(buf)
+	if !isPtr {
+		i = reflect.ValueOf(i).Elem().Interface()
+	}
+
+	return i, nil
 }

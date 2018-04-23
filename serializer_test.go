@@ -8,58 +8,39 @@ import (
 )
 
 func TestSerializer(t *testing.T) {
-	assert := assert.New(t)
-
 	type Object struct {
 		ID   int64
 		Name string
+		Age  *int
 	}
 
-	codec := NewJSONCodec()
-	s := NewSerializer(WithCodec(codec))
+	x := 321
+	tests := map[string]interface{}{
+		"struct":         Object{12345, "aaaa", &x},
+		"struct-pointer": &Object{54321, "bbbb", nil},
+		"int":            123,
+		"int-pointer":    &x,
+	}
+
+	s := NewSerializer(
+		NewJSONMarshaler(),
+		NewJSONEncoder(),
+	)
 	s.Register(
 		Object{},
 		(*Object)(nil),
+		int(123),
+		(*int)(nil),
 	)
 
-	value := Object{
-		12345,
-		"foo",
+	for name, input := range tests {
+		t.Run(name, func(t *testing.T) {
+			buf := &bytes.Buffer{}
+			err := s.Serialize(buf, input)
+			assert.NoError(t, err)
+			v, err := s.Deserialize(buf)
+			assert.NoError(t, err)
+			assert.Equal(t, input, v)
+		})
 	}
-	buf := &bytes.Buffer{}
-	assert.NoError(s.Serialize(buf, value))
-	deserialized, err := s.Deserialize(buf)
-	assert.NoError(err)
-	assert.Equal(value, deserialized)
-
-	pointer := &Object{
-		54321,
-		"bar",
-	}
-	buf = &bytes.Buffer{}
-	assert.NoError(s.Serialize(buf, pointer))
-	deserialized, err = s.Deserialize(buf)
-	assert.NoError(err)
-	assert.Equal(pointer, deserialized)
-
-	value = Object{
-		12345,
-		"foo",
-	}
-	data, err := s.SerializeByte(value)
-	assert.NoError(err)
-	deserialized, err = s.DeserializeByte(data)
-	assert.NoError(err)
-	assert.Equal(value, deserialized)
-
-	pointer = &Object{
-		54321,
-		"bar",
-	}
-	data, err = s.SerializeByte(pointer)
-	assert.NoError(err)
-	deserialized, err = s.DeserializeByte(data)
-	assert.NoError(err)
-	assert.Equal(pointer, deserialized)
-
 }

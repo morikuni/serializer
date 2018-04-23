@@ -5,16 +5,38 @@ import (
 	"io"
 )
 
-func NewJSONCodec() Codec {
+func NewJSONMarshaler() Marshaler {
+	return jsonMarshaler{}
+}
+
+type jsonMarshaler struct{}
+
+var _ interface {
+	Marshaler
+} = jsonMarshaler{}
+
+func (jsonMarshaler) Marshal(v interface{}) ([]byte, error) {
+	return json.Marshal(v)
+}
+
+func (jsonMarshaler) Unmarshal(data []byte, v interface{}) error {
+	return json.Unmarshal(data, v)
+}
+
+func NewJSONEncoder() Encoder {
 	return jsonEncoder{}
 }
 
 type jsonEncoder struct{}
 
-func (e jsonEncoder) Encode(w io.Writer, v interface{}) error {
-	return json.NewEncoder(w).Encode(v)
+func (jsonEncoder) Encode(w io.Writer, d Data) error {
+	return json.NewEncoder(w).Encode(d)
 }
 
-func (e jsonEncoder) Decode(r io.Reader, v interface{}) error {
-	return json.NewDecoder(r).Decode(v)
+func (jsonEncoder) Decode(r io.Reader) (Data, error) {
+	var d Data
+	if err := json.NewDecoder(r).Decode(&d); err != nil {
+		return Data{}, err
+	}
+	return d, nil
 }
