@@ -1,4 +1,4 @@
-// Package serializer serializes a Go object into bytes.
+// Package serializer serializes a struct into bytes.
 package serializer
 
 import (

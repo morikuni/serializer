@@ -5,7 +5,7 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/morikuni/serializer)](https://goreportcard.com/report/github.com/morikuni/serializer)
 [![codecov](https://codecov.io/gh/morikuni/serializer/branch/master/graph/badge.svg)](https://codecov.io/gh/morikuni/serializer)
 
-serializer serializes a Go object into bytes.
+serializer serializes a struct into bytes.
 
 ```go
 package main
