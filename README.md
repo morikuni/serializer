@@ -2,7 +2,7 @@
 
 [![GoDoc](https://godoc.org/github.com/morikuni/serializer?status.svg)](https://godoc.org/github.com/morikuni/serializer)
 
-serializer serializes a Go object into a bytes.
+serializer serializes a Go object into bytes.
 
 ```go
 package main

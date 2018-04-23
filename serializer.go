@@ -1,4 +1,4 @@
-// Package serializer serializes a Go object into a bytes.
+// Package serializer serializes a Go object into bytes.
 package serializer
 
 import (
