@@ -4,11 +4,10 @@ import (
 	"reflect"
 )
 
+// TypeNameOf returns a unique name of the
+// type of v.
 func TypeNameOf(v interface{}) string {
-	return newTypeID(reflect.TypeOf(v))
-}
-
-func newTypeID(t reflect.Type) string {
+	t := reflect.TypeOf(v)
 	delimiter := "."
 	if t.Kind() == reflect.Ptr {
 		t = t.Elem()

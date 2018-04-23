@@ -5,6 +5,8 @@ import (
 	"io"
 )
 
+// NewJSONMarshaler returns a marshaler that marshals an
+// object to json.
 func NewJSONMarshaler() Marshaler {
 	return jsonMarshaler{}
 }
@@ -23,6 +25,8 @@ func (jsonMarshaler) Unmarshal(data []byte, v interface{}) error {
 	return json.Unmarshal(data, v)
 }
 
+// NewJSONEncoder returns a encoder that encodes a
+// data to json.
 func NewJSONEncoder() Encoder {
 	return jsonEncoder{}
 }
@@ -41,6 +45,8 @@ func (jsonEncoder) Decode(r io.Reader) (Data, error) {
 	return d, nil
 }
 
+// NewTextJSONEncoder returns a encoder that encodes a
+// data to json without encoding payload to base64.
 func NewTextJSONEncoder() Encoder {
 	return textJSONEncoder{}
 }

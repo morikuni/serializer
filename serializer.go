@@ -6,15 +6,10 @@ import (
 	"reflect"
 )
 
-type Serializer interface {
-	Register(types ...interface{})
-	RegisterByName(name string, t interface{})
-	Serialize(w io.Writer, v interface{}) error
-	Deserialize(r io.Reader) (interface{}, error)
-}
-
+// NewSerializer returns a Serializer with given marshaler
+// and encoder.
 func NewSerializer(marshaler Marshaler, encoder Encoder) Serializer {
-	s := serializer{
+	s := Serializer{
 		make(map[string]reflect.Type),
 		marshaler,
 		encoder,
@@ -22,23 +17,27 @@ func NewSerializer(marshaler Marshaler, encoder Encoder) Serializer {
 	return s
 }
 
-type serializer struct {
+// Serializer serialize and deserialize a object.
+type Serializer struct {
 	typeMap   map[string]reflect.Type
 	marshaler Marshaler
 	encoder   Encoder
 }
 
-func (s serializer) Register(types ...interface{}) {
+// Register registers the types into serializer.
+func (s Serializer) Register(types ...interface{}) {
 	for _, t := range types {
 		s.RegisterByName(TypeNameOf(t), t)
 	}
 }
 
-func (s serializer) RegisterByName(name string, t interface{}) {
+// RegisterByName registers the type with given name.
+func (s Serializer) RegisterByName(name string, t interface{}) {
 	s.typeMap[name] = reflect.TypeOf(t)
 }
 
-func (s serializer) Serialize(w io.Writer, v interface{}) error {
+// Serialize serialized a object into w.
+func (s Serializer) Serialize(w io.Writer, v interface{}) error {
 	name := TypeNameOf(v)
 	if _, ok := s.typeMap[name]; !ok {
 		return UnknownTypeError{name}
@@ -56,7 +55,8 @@ func (s serializer) Serialize(w io.Writer, v interface{}) error {
 	return s.encoder.Encode(w, d)
 }
 
-func (s serializer) Deserialize(r io.Reader) (interface{}, error) {
+// Deserialize deserializes a object from r.
+func (s Serializer) Deserialize(r io.Reader) (interface{}, error) {
 	d, err := s.encoder.Decode(r)
 	if err != nil {
 		return nil, err

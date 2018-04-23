@@ -7,6 +7,8 @@ import (
 	"github.com/golang/protobuf/proto"
 )
 
+// NewProtobufMarshaler returns a marshaler that marshals an
+// object to protocol buffer.
 func NewProtobufMarshaler() Marshaler {
 	return protobufMarshaler{}
 }
@@ -33,6 +35,8 @@ func (protobufMarshaler) Unmarshal(data []byte, v interface{}) error {
 	return proto.Unmarshal(data, msg)
 }
 
+// NewProtobufEncoder returns a encoder that encodes a
+// data to protocol buffer.
 func NewProtobufEncoder() Encoder {
 	return protobufEncoder{}
 }
