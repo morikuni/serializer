@@ -14,9 +14,12 @@ func TestOption(t *testing.T) {
 
 	m := NewProtobufMarshaler()
 	e := NewTextJSONEncoder()
+	r := NewTypeNameResolver()
 	WithMarshaler(m)(&s)
 	WithEncoder(e)(&s)
+	WithTypeNameResolver(r)(&s)
 
 	assert.Equal(t, m, s.marshaler)
 	assert.Equal(t, e, s.encoder)
+	assert.Equal(t, r, s.resolver)
 }

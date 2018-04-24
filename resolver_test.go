@@ -6,7 +6,9 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-type hello struct{}
+type hello struct {
+	X int
+}
 
 func (*hello) AliasName() []string {
 	return []string{"world"}
@@ -31,7 +33,7 @@ func TestTypeNameResolver(t *testing.T) {
 				nil,
 			},
 		},
-		"struct-pointer": {
+		"struct pointer": {
 			Input: &Data{},
 			Expect: Expect{
 				"github.com/morikuni/*serializer.Data",
@@ -45,7 +47,7 @@ func TestTypeNameResolver(t *testing.T) {
 				nil,
 			},
 		},
-		"int-pointer": {
+		"int pointer": {
 			Input: &i,
 			Expect: Expect{
 				"*int",
@@ -66,14 +68,14 @@ func TestTypeNameResolver(t *testing.T) {
 				nil,
 			},
 		},
-		"alias-namer": {
+		"alias namer": {
 			Input: &hello{},
 			Expect: Expect{
 				"github.com/morikuni/*serializer.hello",
 				[]string{"world"},
 			},
 		},
-		"not-alias-namer": {
+		"not alias namer": {
 			Input: hello{},
 			Expect: Expect{
 				"github.com/morikuni/serializer.hello",

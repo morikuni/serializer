@@ -19,10 +19,14 @@ var _ interface {
 	Marshaler
 } = protobufMarshaler{}
 
+func notProtoMessageError(v interface{}) error {
+	return UnsupportedTypeError{TypeNameOf(v), "does not implement proto.Message"}
+}
+
 func (protobufMarshaler) Marshal(v interface{}) ([]byte, error) {
 	msg, ok := v.(proto.Message)
 	if !ok {
-		return nil, UnsupportedTypeError{TypeNameOf(v), "does not implement proto.Message"}
+		return nil, notProtoMessageError(v)
 	}
 	return proto.Marshal(msg)
 }
@@ -30,7 +34,7 @@ func (protobufMarshaler) Marshal(v interface{}) ([]byte, error) {
 func (protobufMarshaler) Unmarshal(data []byte, v interface{}) error {
 	msg, ok := v.(proto.Message)
 	if !ok {
-		return UnsupportedTypeError{TypeNameOf(v), "does not implement proto.Message"}
+		return notProtoMessageError(v)
 	}
 	return proto.Unmarshal(data, msg)
 }

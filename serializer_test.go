@@ -18,11 +18,12 @@ func TestSerializer(t *testing.T) {
 	x := 321
 	tests := map[string]interface{}{
 		"struct":         Object{12345, "aaaa", &x, []string{"a", "b"}},
-		"struct-pointer": &Object{54321, "bbbb", nil, nil},
+		"struct pointer": &Object{54321, "bbbb", nil, nil},
 		"int":            123,
-		"int-pointer":    &x,
+		"int pointer":    &x,
 		"slice":          []int32{1, 2, 3},
 		"map":            map[string]int{"one": 1, "two": 2},
+		"alias":          &hello{3},
 	}
 
 	s := New(
@@ -36,6 +37,7 @@ func TestSerializer(t *testing.T) {
 		(*int)(nil),
 		[]int32{},
 		map[string]int{},
+		(*hello)(nil),
 	))
 
 	for name, input := range tests {
