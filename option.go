@@ -13,3 +13,9 @@ func WithEncoder(e Encoder) Option {
 		s.encoder = e
 	}
 }
+
+func WithTypeNameResolver(r TypeNameResolver) Option {
+	return func(s *Serializer) {
+		s.resolver = r
+	}
+}

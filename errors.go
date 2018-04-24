@@ -12,7 +12,7 @@ type UnknownTypeError struct {
 
 // Error implements error.
 func (e UnknownTypeError) Error() string {
-	return fmt.Sprintf("unknown type: %q", e.Name)
+	return fmt.Sprintf("unknown type: %q: you should call Serializer.Register", e.Name)
 }
 
 // UnsupportedTypeError is a error used when the type

@@ -13,6 +13,7 @@ func NewSerializer(opts ...Option) Serializer {
 		make(map[string]reflect.Type),
 		NewJSONMarshaler(),
 		NewProtobufEncoder(),
+		NewTypeNameResolver(),
 	}
 
 	for _, opt := range opts {
@@ -27,23 +28,19 @@ type Serializer struct {
 	typeMap   map[string]reflect.Type
 	marshaler Marshaler
 	encoder   Encoder
+	resolver  TypeNameResolver
 }
 
 // Register registers the types into serializer.
 func (s Serializer) Register(types ...interface{}) {
 	for _, t := range types {
-		s.RegisterByName(TypeNameOf(t), t)
+		s.typeMap[s.resolver.ResolveName(t)] = reflect.TypeOf(t)
 	}
-}
-
-// RegisterByName registers the type with given name.
-func (s Serializer) RegisterByName(name string, t interface{}) {
-	s.typeMap[name] = reflect.TypeOf(t)
 }
 
 // Serialize serialized a object into w.
 func (s Serializer) Serialize(w io.Writer, v interface{}) error {
-	name := TypeNameOf(v)
+	name := s.resolver.ResolveName(v)
 	if _, ok := s.typeMap[name]; !ok {
 		return UnknownTypeError{name}
 	}
