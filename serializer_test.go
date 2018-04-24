@@ -25,7 +25,7 @@ func TestSerializer(t *testing.T) {
 		"map":            map[string]int{"one": 1, "two": 2},
 	}
 
-	s := NewSerializer(
+	s := New(
 		WithMarshaler(NewJSONMarshaler()),
 		WithEncoder(NewJSONEncoder()),
 	)

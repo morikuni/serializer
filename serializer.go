@@ -6,9 +6,9 @@ import (
 	"reflect"
 )
 
-// NewSerializer returns a Serializer with given marshaler
+// New returns a Serializer with given marshaler
 // and encoder.
-func NewSerializer(opts ...Option) Serializer {
+func New(opts ...Option) Serializer {
 	s := Serializer{
 		make(map[string]reflect.Type),
 		NewJSONMarshaler(),
