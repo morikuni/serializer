@@ -2,6 +2,7 @@ package serializer
 
 import (
 	"bytes"
+	"io/ioutil"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -49,5 +50,38 @@ func TestSerializer(t *testing.T) {
 			assert.NoError(t, err)
 			assert.Equal(t, input, v)
 		})
+	}
+}
+
+func BenchmarkSerializer_Serialize(b *testing.B) {
+	s := New()
+	assert.NoError(b, s.Register(
+		(*Data)(nil),
+	))
+
+	h := &Data{"aaa", []byte{1, 2, 3}}
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		s.Serialize(ioutil.Discard, h)
+	}
+}
+
+func BenchmarkSerializer_Deserialize(b *testing.B) {
+	s := New()
+	assert.NoError(b, s.Register(
+		(*Data)(nil),
+	))
+
+	b.ResetTimer()
+
+	buf := &bytes.Buffer{}
+	assert.NoError(b, s.Serialize(buf, &Data{"aaa", []byte{1, 2, 3}}))
+
+	r := bytes.NewReader(buf.Bytes())
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		s.Deserialize(r)
 	}
 }

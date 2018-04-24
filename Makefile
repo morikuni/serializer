@@ -13,3 +13,7 @@ deps:
 test:
 	go test -v $(go list ./...)
 .PHONY: test
+
+bench:
+	go test -v -bench . -run '^$$' -benchmem $(go list ./...)
+.PHONY: bench
