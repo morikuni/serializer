@@ -52,7 +52,7 @@ func (s Serializer) Register(types ...interface{}) error {
 
 func (s Serializer) register(name string, t reflect.Type) error {
 	if old, ok := s.typeMap[name]; ok {
-		return DuplicatedNameError{name, old.String(), t.String()}
+		return DuplicatedNameError{name, old, t}
 	}
 	s.typeMap[name] = t
 	return nil

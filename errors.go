@@ -2,9 +2,10 @@ package serializer
 
 import (
 	"fmt"
+	"reflect"
 )
 
-// UnknownTypeError is a error used when the type
+// UnknownTypeError is an error used when the type
 // is not a registered into a Serializer.
 type UnknownTypeError struct {
 	Name string
@@ -12,10 +13,10 @@ type UnknownTypeError struct {
 
 // Error implements error.
 func (e UnknownTypeError) Error() string {
-	return fmt.Sprintf("unknown type: %q: you should call Serializer.Register", e.Name)
+	return fmt.Sprintf("unknown type: %q: register it before serialize/deserialize", e.Name)
 }
 
-// UnsupportedTypeError is a error used when the type
+// UnsupportedTypeError is an error used when the type
 // is not supported by a marshaler. (e.g. the type did not
 // implement a protocol buffer interface.)
 type UnsupportedTypeError struct {
@@ -28,13 +29,15 @@ func (e UnsupportedTypeError) Error() string {
 	return fmt.Sprintf("unsupported type: %q: %s", e.Name, e.Reason)
 }
 
+// DuplicatedNameError is an error used when the name
+// is associated with more than one type.
 type DuplicatedNameError struct {
 	Name string
-	Old  string
-	New  string
+	Old  reflect.Type
+	New  reflect.Type
 }
 
 // Error implements error.
 func (e DuplicatedNameError) Error() string {
-	return fmt.Sprintf("name duplicated: %s: %s has registered but %s has same name", e.Name, e.Old, e.New)
+	return fmt.Sprintf("name duplicated: %q and %q have same name: %q", e.Old.String(), e.New.String(), e.Name)
 }
