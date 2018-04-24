@@ -29,14 +29,14 @@ func TestSerializer(t *testing.T) {
 		WithMarshaler(NewJSONMarshaler()),
 		WithEncoder(NewJSONEncoder()),
 	)
-	s.Register(
+	assert.NoError(t, s.Register(
 		Object{},
 		(*Object)(nil),
 		int(123),
 		(*int)(nil),
 		[]int32{},
 		map[string]int{},
-	)
+	))
 
 	for name, input := range tests {
 		t.Run(name, func(t *testing.T) {

@@ -23,13 +23,15 @@ type Object struct {
 }
 
 func main() {
-	s := serializer.NewSerializer(
-		serializer.NewJSONMarshaler(),
-		serializer.NewTextJSONEncoder(),
+	s := serializer.New(
+		serializer.WithMarshaler(serializer.NewJSONMarshaler()),
+		serializer.WithEncoder(serializer.NewTextJSONEncoder()),
 	)
 
 	// Register the struct to serialize and deserialize
-	s.Register(Object{})
+	if err := s.Register(Object{}); err != nil {
+		panic(err)
+	}
 
 	obj := Object{
 		12345,
@@ -54,6 +56,5 @@ func main() {
 
 	fmt.Printf("%#v\n", x)
 	// main.Object{ID:12345, Name:"foo"}
-}
 }
 ```
