@@ -8,12 +8,17 @@ import (
 
 // NewSerializer returns a Serializer with given marshaler
 // and encoder.
-func NewSerializer(marshaler Marshaler, encoder Encoder) Serializer {
+func NewSerializer(opts ...Option) Serializer {
 	s := Serializer{
 		make(map[string]reflect.Type),
-		marshaler,
-		encoder,
+		NewJSONMarshaler(),
+		NewProtobufEncoder(),
 	}
+
+	for _, opt := range opts {
+		opt(&s)
+	}
+
 	return s
 }
 

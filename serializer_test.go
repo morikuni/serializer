@@ -23,8 +23,8 @@ func TestSerializer(t *testing.T) {
 	}
 
 	s := NewSerializer(
-		NewJSONMarshaler(),
-		NewJSONEncoder(),
+		WithMarshaler(NewJSONMarshaler()),
+		WithEncoder(NewJSONEncoder()),
 	)
 	s.Register(
 		Object{},
