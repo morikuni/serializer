@@ -12,7 +12,7 @@ func New(opts ...Option) Serializer {
 	s := Serializer{
 		make(map[string]reflect.Type),
 		NewJSONMarshaler(),
-		NewProtobufEncoder(),
+		NewTextJSONEncoder(),
 		NewTypeNameResolver(),
 	}
 
