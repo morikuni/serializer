@@ -1,4 +1,5 @@
-// Package serializer serializes a struct into bytes.
+// Package serializer serializes object into bytes,
+// and deserializes object from bytes.
 package serializer
 
 import (
