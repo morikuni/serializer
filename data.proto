@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+package com.github.morikuni.serializer;
+
 option go_package = "serializer";
 
 message Data {
