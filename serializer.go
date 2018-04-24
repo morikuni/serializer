@@ -34,13 +34,18 @@ type Serializer struct {
 // Register registers the types into serializer.
 func (s Serializer) Register(types ...interface{}) {
 	for _, t := range types {
-		s.typeMap[s.resolver.ResolveName(t)] = reflect.TypeOf(t)
+		typ := reflect.TypeOf(t)
+		name, aliases := s.resolver.ResolveName(t)
+		s.typeMap[name] = typ
+		for _, a := range aliases {
+			s.typeMap[a] = typ
+		}
 	}
 }
 
 // Serialize serialized a object into w.
 func (s Serializer) Serialize(w io.Writer, v interface{}) error {
-	name := s.resolver.ResolveName(v)
+	name, _ := s.resolver.ResolveName(v)
 	if _, ok := s.typeMap[name]; !ok {
 		return UnknownTypeError{name}
 	}
