@@ -28,7 +28,6 @@ func TestSerializer(t *testing.T) {
 	}
 
 	s := New(
-		WithMarshaler(NewJSONMarshaler()),
 		WithEncoder(NewJSONEncoder()),
 	)
 	assert.NoError(t, s.Register(
@@ -56,10 +55,10 @@ func TestSerializer(t *testing.T) {
 func BenchmarkSerializer_Serialize(b *testing.B) {
 	s := New()
 	assert.NoError(b, s.Register(
-		(*Data)(nil),
+		(*hello)(nil),
 	))
 
-	h := &Data{"aaa", []byte{1, 2, 3}}
+	h := &hello{123}
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -70,13 +69,13 @@ func BenchmarkSerializer_Serialize(b *testing.B) {
 func BenchmarkSerializer_Deserialize(b *testing.B) {
 	s := New()
 	assert.NoError(b, s.Register(
-		(*Data)(nil),
+		(*hello)(nil),
 	))
 
 	b.ResetTimer()
 
 	buf := &bytes.Buffer{}
-	assert.NoError(b, s.Serialize(buf, &Data{"aaa", []byte{1, 2, 3}}))
+	assert.NoError(b, s.Serialize(buf, &hello{123}))
 
 	r := bytes.NewReader(buf.Bytes())
 

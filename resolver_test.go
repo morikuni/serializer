@@ -27,16 +27,16 @@ func TestTypeNameResolver(t *testing.T) {
 	i := 123
 	tests := map[string]Test{
 		"struct": {
-			Input: Data{},
+			Input: Serializer{},
 			Expect: Expect{
-				"github.com/morikuni/serializer.Data",
+				"github.com/morikuni/serializer.Serializer",
 				nil,
 			},
 		},
 		"struct pointer": {
-			Input: &Data{},
+			Input: &Serializer{},
 			Expect: Expect{
-				"github.com/morikuni/*serializer.Data",
+				"github.com/morikuni/*serializer.Serializer",
 				nil,
 			},
 		},

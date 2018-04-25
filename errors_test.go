@@ -18,13 +18,9 @@ func TestError(t *testing.T) {
 			Input:  UnknownTypeError{"int"},
 			Expect: `unknown type: "int": register it before serialize/deserialize`,
 		},
-		"unsupported type": {
-			Input:  UnsupportedTypeError{"int", "because test"},
-			Expect: `unsupported type: "int": because test`,
-		},
 		"duplicated name": {
-			Input:  DuplicatedNameError{"int", reflect.TypeOf(int(123)), reflect.TypeOf(Data{})},
-			Expect: `name duplicated: "int" and "serializer.Data" have same name: "int"`,
+			Input:  DuplicatedNameError{"int", reflect.TypeOf(int(123)), reflect.TypeOf(hello{})},
+			Expect: `name duplicated: "int" and "serializer.hello" have same name: "int"`,
 		},
 	}
 

@@ -7,40 +7,58 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestEncoder(t *testing.T) {
+type a struct {
+	Int          int
+	Int32Pointer *int32
+	String       string
+	Slice        []int64
+	Map          map[string]float64
+}
+
+func TestJSONEncoder(t *testing.T) {
 	type Test struct {
-		Input Encoder
+		Input a
 	}
 
+	i32 := int32(321)
 	tests := map[string]Test{
-		"json": {
-			Input: NewJSONEncoder(),
+		"normal": Test{
+			a{
+				123,
+				&i32,
+				"456あああ",
+				[]int64{1, 2, 3},
+				map[string]float64{
+					"negative": -7.89,
+				},
+			},
 		},
-		"text json": {
-			Input: NewTextJSONEncoder(),
-		},
-		"protobuf": {
-			Input: NewProtobufEncoder(),
+		"zero value": Test{
+			a{
+				0,
+				nil,
+				"",
+				nil,
+				nil,
+			},
 		},
 	}
 
+	e := NewJSONEncoder()
 	for title, test := range tests {
 		t.Run(title, func(t *testing.T) {
-			e := test.Input
-
-			d1 := Data{
-				Name:    "aaa",
-				Payload: []byte{1, 2, 3},
-			}
-
 			buf := &bytes.Buffer{}
-
-			err := e.Encode(buf, d1)
+			err := e.Encode(buf, "aaa", test.Input)
 			assert.NoError(t, err)
 
-			d2, err := e.Decode(buf)
+			id, payload, err := e.Decode(buf)
 			assert.NoError(t, err)
-			assert.Equal(t, d1, d2)
+			assert.Equal(t, "aaa", id)
+
+			var r a
+			err = e.Unmarshal(payload, &r)
+			assert.NoError(t, err)
+			assert.Equal(t, test.Input, r)
 		})
 	}
 }

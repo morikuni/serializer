@@ -12,8 +12,7 @@ import (
 func New(opts ...Option) Serializer {
 	s := Serializer{
 		make(map[string]reflect.Type),
-		NewJSONMarshaler(),
-		NewTextJSONEncoder(),
+		NewJSONEncoder(),
 		NewTypeNameResolver(),
 	}
 
@@ -26,10 +25,9 @@ func New(opts ...Option) Serializer {
 
 // Serializer serialize and deserialize a object.
 type Serializer struct {
-	typeMap   map[string]reflect.Type
-	marshaler Marshaler
-	encoder   Encoder
-	resolver  TypeNameResolver
+	typeMap  map[string]reflect.Type
+	encoder  Encoder
+	resolver TypeNameResolver
 }
 
 // Register registers the types into serializer.
@@ -66,28 +64,19 @@ func (s Serializer) Serialize(w io.Writer, v interface{}) error {
 		return UnknownTypeError{name}
 	}
 
-	payload, err := s.marshaler.Marshal(v)
-	if err != nil {
-		return err
-	}
-
-	d := Data{
-		name,
-		payload,
-	}
-	return s.encoder.Encode(w, d)
+	return s.encoder.Encode(w, name, v)
 }
 
 // Deserialize deserializes a object from r.
 func (s Serializer) Deserialize(r io.Reader) (interface{}, error) {
-	d, err := s.encoder.Decode(r)
+	name, payload, err := s.encoder.Decode(r)
 	if err != nil {
 		return nil, err
 	}
 
-	t, ok := s.typeMap[d.Name]
+	t, ok := s.typeMap[name]
 	if !ok {
-		return nil, UnknownTypeError{d.Name}
+		return nil, UnknownTypeError{name}
 	}
 
 	isPtr := false
@@ -98,7 +87,7 @@ func (s Serializer) Deserialize(r io.Reader) (interface{}, error) {
 
 	i := reflect.New(t).Interface()
 
-	if err := s.marshaler.Unmarshal(d.Payload, i); err != nil {
+	if err := s.encoder.Unmarshal(payload, i); err != nil {
 		return nil, err
 	}
 
