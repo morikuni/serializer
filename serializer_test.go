@@ -27,9 +27,7 @@ func TestSerializer(t *testing.T) {
 		"alias":          &hello{3},
 	}
 
-	s := New(
-		WithEncoder(NewJSONEncoder()),
-	)
+	s := New()
 	assert.NoError(t, s.Register(
 		Object{},
 		(*Object)(nil),

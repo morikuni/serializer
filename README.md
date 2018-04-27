@@ -31,12 +31,9 @@ type Object struct {
 }
 
 func main() {
-	s := serializer.New(
-		serializer.WithMarshaler(serializer.NewJSONMarshaler()),
-		serializer.WithEncoder(serializer.NewTextJSONEncoder()),
-	)
+	s := serializer.New()
 
-	// Register the struct to serialize and deserialize
+	// Register the object before use it.
 	if err := s.Register(Object{}); err != nil {
 		panic(err)
 	}
@@ -54,7 +51,7 @@ func main() {
 	}
 
 	fmt.Println(buf.String())
-	// {"name":"main.Object","payload":"{\"ID\":12345,\"Name\":\"foo\"}"}
+	// {"id":"main.Object","payload":{"ID":12345,"Name":"foo"}}
 
 	// Deserialize from a io.Reader without specifying the actual type.
 	x, err := s.Deserialize(buf)
